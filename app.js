@@ -118,7 +118,7 @@ app.get('/dashboard', (req, res) => {
     button {
         padding: 10px 20px;
         cursor: pointer;
-    }
+    }  
 </style>    
 <body>
  <h1>Dashboard for ${req.session.user}</h1>
