@@ -71,7 +71,7 @@ app.post('/register', async (req, res) => {
         res.status(500).send('Server error during registration.');
     }
 });
-
+ 
 // 2. Login
 app.post('/login', async (req, res) => {
     try {
