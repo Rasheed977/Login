@@ -186,7 +186,7 @@ app.get('/welcome', (req, res) => {
             <main>
                 <p class="eyebrow">Login completed</p>
                 <h1>Thank you for logging in, <span>${req.session.user}</span>.</h1>
-                <p>Your private space is ready. Continue when you are ready to see your saved notes.</p>
+                <p>Your  Secret dashboard is ready. Continue when you are ready to see your saved notes.</p>
                 <a href="/dashboard">Continue to dashboard</a>
             </main>
         </body>
