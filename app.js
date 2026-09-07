@@ -106,8 +106,6 @@ app.get('/dashboard', (req, res) => {
     <title>Dashboard</title>
 </head>
 <style>
-    @import url('https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Manrope:wght@400;500;600;700;800&display=swap');
-
     :root {
         --ink: #18241f;
         --muted: #718079;
@@ -129,17 +127,6 @@ app.get('/dashboard', (req, res) => {
         color: var(--ink);
         background: var(--cream);
         font-family: Manrope, sans-serif;
-    }
-
-    body::before {
-        position: fixed;
-        z-index: -1;
-        top: 0;
-        right: 0;
-        width: 38vw;
-        height: 5px;
-        background: var(--lime);
-        content: '';
     }
 
     h1 {
@@ -235,12 +222,7 @@ app.get('/dashboard', (req, res) => {
     #notesContainer p { margin: 0 0 14px; color: #66766d; font-size: 13px; line-height: 1.65; white-space: pre-wrap; overflow-wrap: anywhere; }
     #notesContainer button { margin: 0; padding: 0; color: #ad6d62 !important; background: transparent; font: 500 10px "DM Mono", monospace; text-transform: uppercase; }
 
-    @media (max-width: 600px) {
-        body { padding: 34px 18px; }
-        h1 { font-size: 32px; }
-        hr { margin: 28px 0 32px; }
-        input, textarea { width: 100%; }
-    }
+    
 </style>    
 <body>
  <h1>Dashboard for ${req.session.user}</h1>
