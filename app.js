@@ -71,7 +71,7 @@ app.post('/register', async (req, res) => {
         res.status(500).send('Server error during registration.');
     }
 });
- 
+
 // 2. Login
 app.post('/login', async (req, res) => {
     try {
@@ -86,13 +86,112 @@ app.post('/login', async (req, res) => {
         const isMatch = await bcrypt.compare(password, user.password);
         if (isMatch) {
             req.session.user = user.username;
-            res.redirect('/dashboard');
+            res.redirect('/welcome');
         } else {
             res.send('Incorrect password. <a href="/login.html">Try again</a>');
         }
     } catch (err) {
         res.status(500).send('Server error during login.');
     }
+});
+
+app.get('/welcome', (req, res) => {
+    if (!req.session.user) {
+        return res.redirect('/login.html');
+    }
+
+    res.send(`
+        <!DOCTYPE html>
+        <html lang="en">
+        <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>Welcome</title>
+            <style>
+                :root {
+                    --ink: #18241f;
+                    --muted: #718079;
+                    --cream: #f5f7f1;
+                    --lime: #d9f36a;
+                    --green: #285844;
+                }
+
+                * { box-sizing: border-box; }
+
+                body {
+                    display: grid;
+                    min-height: 100vh;
+                    margin: 0;
+                    padding: 24px;
+                    color: var(--ink);
+                    background: var(--cream);
+                    font-family: Manrope, sans-serif;
+                    place-items: center;
+                }
+
+                main {
+                    width: min(100%, 620px);
+                    padding: clamp(32px, 8vw, 76px);
+                    text-align: center;
+                    background: #fffefa;
+                    border: 1px solid #dce5df;
+                    border-radius: 16px;
+                    box-shadow: 0 20px 60px rgba(39, 70, 54, .08);
+                }
+
+                .eyebrow {
+                    margin: 0 0 18px;
+                    color: #739480;
+                    font-family: "DM Mono", monospace;
+                    font-size: 11px;
+                    letter-spacing: .12em;
+                    text-transform: uppercase;
+                }
+
+                h1 {
+                    margin: 0 0 16px;
+                    font-size: clamp(32px, 7vw, 52px);
+                    letter-spacing: -.06em;
+                    line-height: 1.05;
+                }
+
+                h1 span { color: var(--green); }
+
+                p {
+                    margin: 0 auto 30px;
+                    max-width: 420px;
+                    color: var(--muted);
+                    line-height: 1.7;
+                }
+
+                a {
+                    display: inline-block;
+                    padding: 14px 22px;
+                    color: var(--green);
+                    background: var(--lime);
+                    border-radius: 9px;
+                    font-size: 13px;
+                    font-weight: 700;
+                    text-decoration: none;
+                    transition: background .2s, transform .2s;
+                }
+
+                a:hover {
+                    background: #c8e556;
+                    transform: translateY(-1px);
+                }
+            </style>
+        </head>
+        <body>
+            <main>
+                <p class="eyebrow">Login completed</p>
+                <h1>Thank you for logging in, <span>${req.session.user}</span>.</h1>
+                <p>Your private space is ready. Continue when you are ready to see your saved notes.</p>
+                <a href="/dashboard">Continue to dashboard</a>
+            </main>
+        </body>
+        </html>
+    `);
 });
 
 app.get('/dashboard', (req, res) => {
@@ -117,7 +216,9 @@ app.get('/dashboard', (req, res) => {
         --shadow: 0 20px 60px rgba(39, 70, 54, .08);
     }
 
-    * { box-sizing: border-box; }
+    * {
+     box-sizing: border-box;
+     }
 
     body {
         max-width: 1180px;
@@ -129,6 +230,11 @@ app.get('/dashboard', (req, res) => {
         font-family: Manrope, sans-serif;
     }
 
+    span {
+        color: var(--green);
+        font-weight: 700;
+    }
+        
     h1 {
         margin: 0 0 8px;
         color: var(--ink);
@@ -141,7 +247,7 @@ app.get('/dashboard', (req, res) => {
         display: block;
         margin-bottom: 14px;
         color: #739480;
-        content: 'YOUR QUIET CORNER';
+        content: 'YOUR SECRET DASHBOARD';
         font-family: "DM Mono", monospace;
         font-size: 11px;
         font-weight: 500;
@@ -169,7 +275,14 @@ app.get('/dashboard', (req, res) => {
         text-decoration: none;
     }
 
-    a:hover { color: #597e32; text-decoration: underline; }
+    a:hover {
+     color: #597e32;
+      text-decoration: underline;
+      display: inline-block;
+      background: var(--lime);
+      border-radius: 5px;
+      padding: 2px 6px;
+       }
 
     input, textarea {
         display: block;
@@ -185,10 +298,22 @@ app.get('/dashboard', (req, res) => {
         transition: border-color .2s, box-shadow .2s;
     }
 
-    input { margin: 0 0 14px; }
-    textarea { min-height: 150px; resize: vertical; }
-    input:focus, textarea:focus { border-color: #8eac66; box-shadow: 0 0 0 3px rgba(217, 243, 106, .3); }
-    input::placeholder, textarea::placeholder { color: #9aa69f; }
+    input { 
+    margin: 0 0 14px; 
+    }
+
+    textarea { min-height: 150px;
+     resize: vertical; 
+     }
+
+    input:focus, textarea:focus {
+     border-color: #8eac66; 
+    box-shadow: 0 0 0 3px rgba(217, 243, 106, .3);
+     }
+
+    input::placeholder,textarea::placeholder { 
+    color: #9aa69f;
+     }
 
     button {
         margin-top: 16px;
@@ -202,7 +327,10 @@ app.get('/dashboard', (req, res) => {
         transition: background .2s, transform .2s;
     }
 
-    button:hover { background: #c8e556; transform: translateY(-1px); }
+    button:hover { 
+    background: #c8e556;
+     transform: translateY(-1px);
+      }
 
     #notesContainer {
         display: grid;
@@ -218,14 +346,34 @@ app.get('/dashboard', (req, res) => {
         box-shadow: var(--shadow);
     }
 
-    #notesContainer h4 { margin: 0 0 10px; color: var(--ink); font-size: 16px; letter-spacing: -.03em; }
-    #notesContainer p { margin: 0 0 14px; color: #66766d; font-size: 13px; line-height: 1.65; white-space: pre-wrap; overflow-wrap: anywhere; }
-    #notesContainer button { margin: 0; padding: 0; color: #ad6d62 !important; background: transparent; font: 500 10px "DM Mono", monospace; text-transform: uppercase; }
+    #notesContainer h4 { 
+    margin: 0 0 10px;
+     color: var(--ink);
+      font-size: 16px; 
+      letter-spacing: -.03em;
+       }
+
+    #notesContainer p { 
+    margin: 0 0 14px; 
+    color: #66766d;
+     font-size:13px; 
+     line-height:1.65;
+      white-space:pre-wrap;
+       overflow-wrap:anywhere;
+        }
+
+    #notesContainer button { 
+    margin: 0;
+     padding: 0;
+     color: #ad6d62 !important;
+      background: transparent;
+       font:500 10px "DM Mono",monospace;
+        text-transform: uppercase; }
 
     
 </style>    
 <body>
- <h1>Dashboard for ${req.session.user}</h1>
+ <h1>Dashboard for <span>${req.session.user}</span></h1>
  <a href="/logout">Logout</a>
  <hr>
  <h3>Create a New Private Note</h3>
