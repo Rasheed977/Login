@@ -106,19 +106,141 @@ app.get('/dashboard', (req, res) => {
     <title>Dashboard</title>
 </head>
 <style>
+    @import url('https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Manrope:wght@400;500;600;700;800&display=swap');
+
+    :root {
+        --ink: #18241f;
+        --muted: #718079;
+        --line: #dce5df;
+        --cream: #f5f7f1;
+        --paper: #fffefa;
+        --lime: #d9f36a;
+        --green: #285844;
+        --shadow: 0 20px 60px rgba(39, 70, 54, .08);
+    }
+
+    * { box-sizing: border-box; }
+
     body {
-        font-family: Arial, sans-serif;
-        margin: 20px;
+        max-width: 1180px;
+        min-height: 100vh;
+        margin: 0 auto;
+        padding: 54px clamp(24px, 6vw, 80px);
+        color: var(--ink);
+        background: var(--cream);
+        font-family: Manrope, sans-serif;
     }
+
+    body::before {
+        position: fixed;
+        z-index: -1;
+        top: 0;
+        right: 0;
+        width: 38vw;
+        height: 5px;
+        background: var(--lime);
+        content: '';
+    }
+
+    h1 {
+        margin: 0 0 8px;
+        color: var(--ink);
+        font-size: clamp(30px, 5vw, 48px);
+        letter-spacing: -.06em;
+        line-height: 1.05;
+    }
+
+    h1::before {
+        display: block;
+        margin-bottom: 14px;
+        color: #739480;
+        content: 'YOUR QUIET CORNER';
+        font-family: "DM Mono", monospace;
+        font-size: 11px;
+        font-weight: 500;
+        letter-spacing: .12em;
+    }
+
+    h3 {
+        margin: 34px 0 14px;
+        color: var(--green);
+        font-size: 17px;
+        letter-spacing: -.04em;
+    }
+
+    hr {
+        height: 1px;
+        margin: 34px 0 38px;
+        border: 0;
+        background: var(--line);
+    }
+
+    a {
+        color: var(--green);
+        font-size: 12px;
+        font-weight: 700;
+        text-decoration: none;
+    }
+
+    a:hover { color: #597e32; text-decoration: underline; }
+
     input, textarea {
-        width: 300px;
-        padding: 10px;
-        margin-bottom: 10px;
+        display: block;
+        width: min(100%, 520px);
+        padding: 14px 15px;
+        color: var(--ink);
+        background: var(--paper);
+        border: 1px solid var(--line);
+        border-radius: 9px;
+        outline: none;
+        font: inherit;
+        line-height: 1.5;
+        transition: border-color .2s, box-shadow .2s;
     }
+
+    input { margin: 0 0 14px; }
+    textarea { min-height: 150px; resize: vertical; }
+    input:focus, textarea:focus { border-color: #8eac66; box-shadow: 0 0 0 3px rgba(217, 243, 106, .3); }
+    input::placeholder, textarea::placeholder { color: #9aa69f; }
+
     button {
-        padding: 10px 20px;
+        margin-top: 16px;
+        padding: 13px 20px;
+        color: var(--green);
+        background: var(--lime);
+        border: 0;
+        border-radius: 9px;
+        font: 700 13px Manrope, sans-serif;
         cursor: pointer;
-    }  
+        transition: background .2s, transform .2s;
+    }
+
+    button:hover { background: #c8e556; transform: translateY(-1px); }
+
+    #notesContainer {
+        display: grid;
+        gap: 12px;
+        width: min(100%, 760px);
+    }
+
+    #notesContainer > div {
+        padding: 20px !important;
+        background: var(--paper);
+        border: 1px solid var(--line) !important;
+        border-radius: 12px !important;
+        box-shadow: var(--shadow);
+    }
+
+    #notesContainer h4 { margin: 0 0 10px; color: var(--ink); font-size: 16px; letter-spacing: -.03em; }
+    #notesContainer p { margin: 0 0 14px; color: #66766d; font-size: 13px; line-height: 1.65; white-space: pre-wrap; overflow-wrap: anywhere; }
+    #notesContainer button { margin: 0; padding: 0; color: #ad6d62 !important; background: transparent; font: 500 10px "DM Mono", monospace; text-transform: uppercase; }
+
+    @media (max-width: 600px) {
+        body { padding: 34px 18px; }
+        h1 { font-size: 32px; }
+        hr { margin: 28px 0 32px; }
+        input, textarea { width: 100%; }
+    }
 </style>    
 <body>
  <h1>Dashboard for ${req.session.user}</h1>
@@ -145,7 +267,7 @@ app.get('/dashboard', (req, res) => {
  }
  notes.forEach(note => {
  container.innerHTML += \`
- <div style="border: 1px solid #ccc; padding: 10px; margin: 10px 0; border-radius:5px;">
+ <div style="border: 1px solid #ccc;  padding: 10px; margin: 10px 0; border-radius:5px;">
  <h4>\${note.title}</h4>
  <p>\${note.content}</p>
  <button onclick="deleteNote('\${note._id}')" style="color:red;">Delete</button>
