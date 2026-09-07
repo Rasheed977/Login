@@ -406,6 +406,20 @@ app.get('/dashboard', (req, res) => {
  });
  }
 
+ async function deleteNote(noteId) {
+ const response = await fetch('/api/notes/' + encodeURIComponent(noteId), {
+ method: 'DELETE'
+ });
+
+ if (!response.ok) {
+ const result = await response.json().catch(() => ({}));
+ alert(result.error || 'Failed to delete note.');
+ return;
+ }
+
+ loadNotes();
+ }
+
  // Send data via JSON to our REST API
     async function saveNote() {
    const title = document.getElementById('title').value;
