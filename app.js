@@ -199,31 +199,59 @@ app.get('/dashboard', async (req, res) => {
             return res.redirect('/logout');
         }
 res.send(`
- <h1>Dashboard for ${req.session.user}</h1>
+ <h1>Dashboard for <span>${req.session.user}</span></h1>
  <a href="/logout">Logout</a>
  <hr>
 <style>
+     .root {
+        --ink: #18241f;
+        --muted: #718079;
+        --cream: #f5f7f1;
+        --lime: #d9f36a;
+        --green: #285844;
+    }
+    * {
+        box-sizing: border-box;
+    }   
     body {
+        scroll-behavior: smooth;
+        scrollbar-width: thin;
+        scrollbar-color: var(--green) var(--cream);
         font-family: Arial, sans-serif;
         margin: 20px;
     }
+        span {
+        color: var(--green);
+    }
+    h1 {
+        font-size: 24px;
+        margin-bottom: 20px;
+    }
+    hr {
+        margin: 20px 0;
+    }
+    label {
+        display: block;
+        margin-bottom: 5px;
+        font-weight: bold;
+    }
     input, textarea {
-        width: 100%;
+        width:70%;
         padding: 10px;
         margin-bottom: 10px;
         border-radius: 5px;
-        border: 1px solid #ccc;
+        border: 1px solid var(--muted);
     }
     button {
         padding: 10px 20px;
-        background-color: #4CAF50;
-        color: white;
+        background-color: var(--lime);
+        color: var(--ink);
         border: none;
         border-radius: 5px;
         cursor: pointer;
     }
     button:hover {
-        background-color: #45a049;
+        background-color: var(--green);
     }
 </style>
  <h3>Create a New Note with Image</h3>
