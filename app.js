@@ -235,6 +235,7 @@ res.send(`
         margin-bottom: 5px;
         font-weight: bold;
     }
+           
     input, textarea {
         width:70%;
         padding: 10px;
