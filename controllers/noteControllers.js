@@ -43,3 +43,28 @@ exports.getUserNotes = async (req, res) => {
  }
 };
 // (Keep your createNote function underneath completely unchanged!)
+const Note = require('../models/Note');
+const User = require('../models/User');
+exports.createNote = async (req, res) => {
+ if (!req.session.user) return res.status(401).json({ error: 'Unauthorized' });
+ try {
+ const { title, content } = req.body;
+ const currentUser = await User.findOne({ username: req.session.user });
+ // Check if a file was actually uploaded by the client user
+ let imageUrl = '';
+ if (req.file) {
+ // Store the web-accessible URL path string pointing to our local public folder
+ imageUrl = `/uploads/${req.file.filename}`;
+ }
+ const newNote = new Note({
+ title,
+ content,
+ userId: currentUser._id,
+ imageUrl: imageUrl // Store file path directly alongside note records
+ });
+ await newNote.save();
+ res.status(201).json({ message: 'Note saved successfully!', note: newNote });
+ } catch (err) {
+ res.status(500).json({ error: 'Failed to save note with attached asset.' });
+ }
+};
