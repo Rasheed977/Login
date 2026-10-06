@@ -202,17 +202,7 @@ res.send(`
  <h1>Dashboard for <span>${req.session.user}</span></h1>
  <a href="/logout">Logout</a>
  <hr>
-<style>
-     .root {
-        --ink: #18241f;
-        --muted: #718079;
-        --cream: #f5f7f1;
-        --lime: #d9f36a;
-        --green: #285844;
-    }
-    * {
-        box-sizing: border-box;
-    }   
+<style> 
     body {
         scroll-behavior: smooth;
         scrollbar-width: thin;
@@ -235,24 +225,24 @@ res.send(`
         margin-bottom: 5px;
         font-weight: bold;
     }
-           
+
     input, textarea {
         width:70%;
         padding: 10px;
         margin-bottom: 10px;
         border-radius: 5px;
-        border: 1px solid var(--muted);
+        border: 1px solid #ccc;
     }
     button {
         padding: 10px 20px;
-        background-color: var(--lime);
-        color: var(--ink);
+        background-color: #285844;
+        color: #fff;
         border: none;
         border-radius: 5px;
         cursor: pointer;
     }
     button:hover {
-        background-color: var(--green);
+        background-color: #1f4235;
     }
 </style>
  <h3>Create a New Note with Image</h3>
