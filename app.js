@@ -251,8 +251,8 @@ res.send(`
  <input type="text" id="title" placeholder="Note Title"><br><br>
  <textarea id="content" placeholder="Write something..."></textarea><br><br>
 
- <label>Attach an Image (Max 2MB):</label><br>
- <input type="file" id="imageFile" accept="image/*"><br><br>
+ <label>Attach an Image (Max 10MB):</label><br>
+ <input type="file" id="imageFile" accept="image/jpeg,image/png,image/gif,image/webp"><br><br>
 
  <button id="saveNoteButton" type="button" onclick="saveNote()">Save Note</button>
  <p id="noteStatus" role="status" aria-live="polite"></p>
