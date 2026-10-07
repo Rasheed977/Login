@@ -14,15 +14,17 @@ const fileFilter = (req, file, cb) => {
  const allowedTypes = {
   '.jpg': 'image/jpeg',
   '.jpeg': 'image/jpeg',
-  '.png': 'image/png',
-  '.gif': 'image/gif',
-  '.webp': 'image/webp'
+ '.jfif': 'image/jpeg',
+ '.png': 'image/png',
+ '.gif': 'image/gif',
+ '.webp': 'image/webp'
  };
  const extension = path.extname(file.originalname).toLowerCase();
- if (allowedTypes[extension] === file.mimetype) {
+ if (allowedTypes[extension] === file.mimetype ||
+    (allowedTypes[extension] === 'image/jpeg' && file.mimetype === 'image/jpg')) {
  return cb(null, true);
  } else {
- cb(new Error('Security Error: Only JPG, JPEG, PNG, GIF, and WebP images are allowed!'));
+ cb(new Error(`Unsupported image format (${extension || 'unknown extension'}, ${file.mimetype || 'unknown type'}). Use JPG, JPEG, JFIF, PNG, GIF, or WebP.`));
  }
 };
 

@@ -252,7 +252,7 @@ res.send(`
  <textarea id="content" placeholder="Write something..."></textarea><br><br>
 
  <label>Attach an Image (Max 10MB):</label><br>
- <input type="file" id="imageFile" accept="image/jpeg,image/png,image/gif,image/webp"><br><br>
+ <input type="file" id="imageFile" accept=".jpg,.jpeg,.jfif,.png,.gif,.webp,image/jpeg,image/png,image/gif,image/webp"><br><br>
 
  <button id="saveNoteButton" type="button" onclick="saveNote()">Save Note</button>
  <p id="noteStatus" role="status" aria-live="polite"></p>
@@ -284,11 +284,32 @@ res.send(`
                  imageElement.style.cssText = 'max-width:300px; border-radius:5px; margin-top:10px;';
                  card.appendChild(imageElement);
              }
+             const deleteButton = document.createElement('button');
+             deleteButton.type = 'button';
+             deleteButton.textContent = 'Delete note';
+             deleteButton.style.cssText = 'display:block; margin-top:10px; background-color:#a83232;';
+             deleteButton.addEventListener('click', () => deleteNote(note._id, deleteButton));
+             card.appendChild(deleteButton);
              container.appendChild(card);
          });
          if (data.notes.length === 0) container.textContent = 'No saved notes yet.';
      } catch (error) {
          container.textContent = error.message;
+     }
+ }
+ async function deleteNote(noteId, button) {
+     if (!confirm('Delete this note? This cannot be undone.')) return;
+
+     button.disabled = true;
+     try {
+         const response = await fetch('/api/notes/' + encodeURIComponent(noteId), { method: 'DELETE' });
+         const data = await response.json();
+         if (!response.ok) throw new Error(data.error || 'Could not delete note.');
+         noteStatus.textContent = 'Note deleted.';
+         await loadNotes();
+     } catch (error) {
+         noteStatus.textContent = error.message;
+         button.disabled = false;
      }
  }
  async function saveNote() {
