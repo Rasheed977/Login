@@ -6,6 +6,7 @@ const session = require('express-session');
 const bcrypt = require('bcryptjs');
 const mongoose = require('mongoose');
 const path = require('path');
+const upload = require('./middleware/uploadHelper');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -15,6 +16,7 @@ const noteSchema = new mongoose.Schema({
     title: { type: String, required: true },
     content: { type: String, required: true },
     userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
+    imageUrl: { type: String, default: '' },
     createdAt: { type: Date, default: Date.now }
 });
 noteSchema.index({ userId: 1, createdAt: -1 });
@@ -252,52 +254,71 @@ res.send(`
  <label>Attach an Image (Max 2MB):</label><br>
  <input type="file" id="imageFile" accept="image/*"><br><br>
 
- <button onclick="saveNote()">Save Note</button>
+ <button id="saveNoteButton" type="button" onclick="saveNote()">Save Note</button>
+ <p id="noteStatus" role="status" aria-live="polite"></p>
  <hr>
  <h3>Your Saved Notes</h3>
  <div id="notesContainer">Loading...</div>
  <script>
+ const noteStatus = document.getElementById('noteStatus');
  async function loadNotes() {
- const response = await fetch('/api/notes?limit=10'); // Fetch last 10 entries
- const data = await response.json();
- const container = document.getElementById('notesContainer');
- container.innerHTML = '';
- data.notes.forEach(note => {
- // If an image URL path path string exists, render an img HTML tag container block
- const imageElement = note.imageUrl
- ? \`<br><img src="\${note.imageUrl}" style="max-width:300px; border-radius:5px; margin-top:10px;" al
- : '';
- container.innerHTML += \`
- <div style="border: 1px solid #ccc; padding: 15px; margin: 10px 0; border-radius:5px;">
- <h4>\${note.title}</h4>
- <p>\${note.content}</p>
- \${imageElement}
- </div>
- \`;
- });
+     const container = document.getElementById('notesContainer');
+     try {
+         const response = await fetch('/api/notes?limit=10');
+         const data = await response.json();
+         if (!response.ok) throw new Error(data.error || 'Could not load saved notes.');
+
+         container.replaceChildren();
+         data.notes.forEach(note => {
+             const card = document.createElement('div');
+             card.style.cssText = 'border: 1px solid #ccc; padding: 15px; margin: 10px 0; border-radius:5px;';
+             const titleElement = document.createElement('h4');
+             titleElement.textContent = note.title;
+             const contentElement = document.createElement('p');
+             contentElement.textContent = note.content;
+             card.append(titleElement, contentElement);
+             if (note.imageUrl) {
+                 const imageElement = document.createElement('img');
+                 imageElement.src = note.imageUrl;
+                 imageElement.alt = 'Attached image';
+                 imageElement.style.cssText = 'max-width:300px; border-radius:5px; margin-top:10px;';
+                 card.appendChild(imageElement);
+             }
+             container.appendChild(card);
+         });
+         if (data.notes.length === 0) container.textContent = 'No saved notes yet.';
+     } catch (error) {
+         container.textContent = error.message;
+     }
  }
  async function saveNote() {
- const title = document.getElementById('title').value;
- const content = document.getElementById('content').value;
- const fileInput = document.getElementById('imageFile');
- // Use FormData object to handle compound file multi-part data stream packages
- const formData = new FormData();
- formData.append('title', title);
- formData.append('content', content);
+     const titleInput = document.getElementById('title');
+     const contentInput = document.getElementById('content');
+     const fileInput = document.getElementById('imageFile');
+     const saveButton = document.getElementById('saveNoteButton');
+     const formData = new FormData();
+     formData.append('title', titleInput.value);
+     formData.append('content', contentInput.value);
 
- if (fileInput.files[0]) {
- formData.append('image', fileInput.files[0]);
- }
- // Send payload data directly to our REST API endpoint
- // (Note: Do NOT set Content-Type headers manually when sending FormData, the browser handles it automatical
- await fetch('/api/notes', {
- method: 'POST',
- body: formData
- });
- document.getElementById('title').value = '';
- document.getElementById('content').value = '';
- fileInput.value = '';
- loadNotes();
+     if (fileInput.files[0]) formData.append('image', fileInput.files[0]);
+
+     saveButton.disabled = true;
+     noteStatus.textContent = 'Saving...';
+     try {
+         const response = await fetch('/api/notes', { method: 'POST', body: formData });
+         const data = await response.json();
+         if (!response.ok) throw new Error(data.error || 'Could not save note.');
+
+         titleInput.value = '';
+         contentInput.value = '';
+         fileInput.value = '';
+         noteStatus.textContent = 'Note saved successfully.';
+         await loadNotes();
+     } catch (error) {
+         noteStatus.textContent = error.message;
+     } finally {
+         saveButton.disabled = false;
+     }
  }
  loadNotes();
  </script>
@@ -317,11 +338,19 @@ app.get('/logout', (req, res) => {
 });
 
 // 5. Notes API - Create
-app.post('/api/notes', async (req, res) => {
+app.post('/api/notes', (req, res, next) => {
     if (!req.session.user) {
         return res.status(401).json({ error: 'Unauthorized. Please log in.' });
     }
 
+    upload.single('image')(req, res, err => {
+        if (err) {
+            const status = err.code === 'LIMIT_FILE_SIZE' ? 413 : 400;
+            return res.status(status).json({ error: err.message });
+        }
+        next();
+    });
+}, async (req, res) => {
     try {
         const { title, content } = req.body;
 
@@ -337,7 +366,8 @@ app.post('/api/notes', async (req, res) => {
         const newNote = new Note({
             title,
             content,
-            userId: currentUser._id
+            userId: currentUser._id,
+            imageUrl: req.file ? `/uploads/${req.file.filename}` : ''
         });
 
         await newNote.save();
