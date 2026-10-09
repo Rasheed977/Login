@@ -204,13 +204,22 @@ res.send(`
  <h1>Dashboard for <span>${req.session.user}</span></h1>
  <a href="/logout">Logout</a>
  <hr>
-<style> 
+<style>
+      :root {
+        --ink: #18241f;
+        --muted: #718079;
+        --cream: #f5f7f1;
+        --lime: #d9f36a;
+        --green: #285844;
+    }
+
     body {
         scroll-behavior: smooth;
         scrollbar-width: thin;
         scrollbar-color: var(--green) var(--cream);
         font-family: Arial, sans-serif;
         margin: 20px;
+        color: var(--ink);
     }
         span {
         color: var(--green);
